@@ -54,13 +54,14 @@ export function Home() {
         
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 relative">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl -z-10"></div>
-        {DEMO_PROJECTS.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            className="hover:scale-[1.02] transition-transform"
-          />
-        ))}
+          {DEMO_PROJECTS.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              className="hover:scale-[1.02] transition-transform"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

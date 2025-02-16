@@ -15,10 +15,13 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, className }: ProjectCardProps) {
   return (
-    <div className={cn(
-      "group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm transition-all hover:border-gray-700 hover:shadow-2xl hover:shadow-purple-500/10",
-      className
-    )}>
+    <Link
+      to={`/projects/${project.id}`}
+      className={cn(
+        "group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm transition-all hover:border-gray-700 hover:shadow-2xl hover:shadow-purple-500/10 block",
+        className
+      )}
+    >
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
       <div className="aspect-video w-full overflow-hidden rounded-t-xl">
         <img
@@ -42,14 +45,16 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
             </span>
           ))}
         </div>
-        <Link
-          to={`/projects/${project.id}`}
-          className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
-        >
-          Ver Projeto
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        <div className="mt-6">
+          <Link
+            to={`/projects/${project.id}`}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer"
+          >
+            Ver Projeto
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -13,8 +13,8 @@ const PROJECT_COMPONENTS: ProjectComponents = {
   'interactive-calculator': InteractiveCalculator,
   'skill-sphere': SkillSphereDashboard,
   'visuar': VisuARDemoEnhanced,
-  'camia-security': CamIASecurityDashboard,
-  'custom-bi': UXCustomBIDemo, // Mapeamento do UXCustomBI Pro
+  'camia': CamIASecurityDashboard,
+  'customBI': UXCustomBIDemo,
 };
 
 export function Project() {

@@ -23,14 +23,14 @@ const DEMO_PROJECTS = [
     image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'camia-security',
+    id: 'camia',
     title: 'CamIASecurity 2.0',
     description: 'Advanced AI monitoring system for specific behavior detection.',
     tags: ['React', 'AI', 'Security', 'Dashboard'],
     image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'custom-bi',
+    id: 'customBI',
     title: 'UXCustomBI Pro',
     description: 'Plataforma de dashboards customizáveis com edição drag-and-drop e integração em tempo real.',
     tags: ['React', 'TypeScript', 'TailwindCSS', 'Dashboard'],

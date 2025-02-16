@@ -40,17 +40,20 @@ const DEMO_PROJECTS = [
 
 export function Home() {
   return (
-    <div className="container px-4 py-8 sm:px-8">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Project Showcase
-        </h1>
-        <p className="text-gray-400 text-lg">
-          Explore our collection of interactive frontend projects
-        </p>
-      </div>
-      
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800">
+      <div className="container px-4 py-16 sm:px-8">
+        <div className="space-y-6 max-w-3xl mx-auto text-center mb-16">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Project Showcase
+          </h1>
+          <p className="text-gray-400 text-xl">
+            Explore nossa coleção de projetos frontend interativos e inovadores
+          </p>
+          <div className="w-32 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto rounded-full"></div>
+        </div>
+        
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl -z-10"></div>
         {DEMO_PROJECTS.map((project) => (
           <ProjectCard
             key={project.id}

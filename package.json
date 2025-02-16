@@ -2,6 +2,10 @@
   "name": "project-showcase",
   "private": true,
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "SEU_LINK_GITHUB_AQUI"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

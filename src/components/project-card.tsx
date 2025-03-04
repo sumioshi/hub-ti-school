@@ -46,13 +46,13 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
           ))}
         </div>
         <div className="mt-6">
-          <Link
-            to={`/projects/${project.id}`}
+          <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer"
+            onClick={() => window.location.href = `/projects/${project.id}`}
           >
             Ver Projeto
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </div>
         </div>
       </div>
     </Link>

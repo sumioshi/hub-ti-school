@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BackButton } from '../../components/BackButton';
 import {
   BarChart,
   Bar,
@@ -12,14 +13,16 @@ import {
 } from 'recharts';
 import {
   Box,
-  Eye,
-  Camera,
   Move3d,
   RotateCw,
   ZoomIn,
   Share2,
-  PanelLeftClose,
-  PanelLeftOpen
+  DollarSign,
+  ShoppingCart,
+  Users,
+  CreditCard,
+  TrendingUp,
+  X
 } from 'lucide-react';
 
 // Dados de exemplo
@@ -32,6 +35,17 @@ const salesData = [
   { month: 'Jun', revenue: 3390, profit: 1017, units: 310, region: 'Sul', category: 'Serviços' },
 ];
 
+interface SalesData {
+  month: string;
+  revenue: number;
+  profit: number;
+  units: number;
+  region: string;
+  category: string;
+}
+
+type MetricKey = 'revenue' | 'profit' | 'units';
+
 // Função para calcular um resumo dos dados
 const calculateSummary = (data: typeof salesData) => {
   const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
@@ -42,11 +56,9 @@ const calculateSummary = (data: typeof salesData) => {
 
 const VisuARDemoEnhanced: React.FC = () => {
   // Estados de controle
-  const [mode, setMode] = useState('2d'); // '2d', '3d' ou 'ar'
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
-  const [activeDataPoint, setActiveDataPoint] = useState<any>(null);
+  const [activeDataPoint, setActiveDataPoint] = useState<SalesData | null>(null);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState('6M');
-  const [selectedMetric, setSelectedMetric] = useState('revenue');
+  const [selectedMetric, setSelectedMetric] = useState<MetricKey>('revenue');
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
   const [isLoading, setIsLoading] = useState(false);
   const [showARGuide, setShowARGuide] = useState(false);
@@ -57,32 +69,10 @@ const VisuARDemoEnhanced: React.FC = () => {
   // Resumo dos dados
   const summary = calculateSummary(salesData);
 
-  // Alteração de modo com simulação de loading e toast feedback
-  const handleModeChange = (newMode: string) => {
-    setIsLoading(true);
-    setToastMessage(`Mudando para modo ${newMode.toUpperCase()}...`);
-    setMode(newMode);
-    setTimeout(() => {
-      setIsLoading(false);
-      setToastMessage(`Modo ${newMode.toUpperCase()} ativado!`);
-      setTimeout(() => setToastMessage(null), 2000);
-      if (newMode === 'ar') {
-        setShowARGuide(true);
-      }
-    }, 1000);
-  };
-
   // Alteração do tipo de gráfico
-  const handleChartTypeToggle = (type: 'bar' | 'line') => {
-    setChartType(type);
-    setToastMessage(`Tipo de gráfico alterado para ${type === 'bar' ? 'Barras' : 'Linhas'}`);
-    setTimeout(() => setToastMessage(null), 2000);
-  };
-
-  // Alterna entre fullscreen e modo normal para AR
-  const handleToggleFullScreen = () => {
-    setIsFullScreen(!isFullScreen);
-    setToastMessage(isFullScreen ? 'Saindo do modo fullscreen' : 'Entrando no modo fullscreen');
+  const handleChartTypeToggle = () => {
+    setChartType(prev => prev === 'bar' ? 'line' : 'bar');
+    setToastMessage(`Tipo de gráfico alterado para ${chartType === 'bar' ? 'Linhas' : 'Barras'}`);
     setTimeout(() => setToastMessage(null), 2000);
   };
 
@@ -93,9 +83,11 @@ const VisuARDemoEnhanced: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Abre o modal de compartilhamento
-  const handleShareDashboard = () => {
-    setShowShareModal(true);
+  // Alterna entre fullscreen e modo normal
+  const handleToggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
+    setToastMessage(isFullScreen ? 'Saindo do modo fullscreen' : 'Entrando no modo fullscreen');
+    setTimeout(() => setToastMessage(null), 2000);
   };
 
   // Renderiza o toast de feedback
@@ -110,7 +102,7 @@ const VisuARDemoEnhanced: React.FC = () => {
   const renderLoadingOverlay = () => (
     <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50">
       <div className="w-16 h-16 border-4 border-t-transparent border-blue-500 rounded-full animate-spin mb-4"></div>
-      <p className="text-white text-lg">Carregando {mode.toUpperCase()}...</p>
+      <p className="text-white text-lg">Carregando {chartType === 'bar' ? 'BarChart' : 'LineChart'}...</p>
     </div>
   );
 
@@ -176,16 +168,28 @@ const VisuARDemoEnhanced: React.FC = () => {
       </div>
 
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-4 bg-black bg-opacity-50 p-3 rounded-full shadow-lg">
-        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors">
+        <button 
+          className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+          title="Rotacionar visualização"
+        >
           <RotateCw className="w-6 h-6 text-white" />
         </button>
-        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors">
+        <button 
+          className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+          title="Aumentar zoom"
+        >
           <ZoomIn className="w-6 h-6 text-white" />
         </button>
-        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors">
+        <button 
+          className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+          title="Mover visualização"
+        >
           <Move3d className="w-6 h-6 text-white" />
         </button>
-        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors">
+        <button 
+          className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+          title="Compartilhar visualização"
+        >
           <Share2 className="w-6 h-6 text-white" />
         </button>
       </div>
@@ -289,173 +293,252 @@ const VisuARDemoEnhanced: React.FC = () => {
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-8 bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen relative">
-      {renderToast()}
-      <div className="bg-gray-900 rounded-2xl shadow-lg p-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold text-white">VisuAR Insight</h1>
-            <button
-              onClick={() => setIsPanelOpen(!isPanelOpen)}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              {isPanelOpen ? <PanelLeftClose className="w-6 h-6 text-gray-300" /> : <PanelLeftOpen className="w-6 h-6 text-gray-300" />}
-            </button>
+    <div className="flex flex-col min-h-screen bg-gray-900">
+      <BackButton />
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Painel Principal */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Cabeçalho */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <h1 className="text-3xl font-bold text-white">Dashboard de Vendas</h1>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-colors"
+                >
+                  Compartilhar Dashboard
+                </button>
+                <button
+                  onClick={handleChartTypeToggle}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    chartType === 'bar'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  {chartType === 'bar' ? 'Gráfico de Barras' : 'Gráfico de Linha'}
+                </button>
+              </div>
+            </div>
+
+            {/* Gráfico */}
+            <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+              <div className="h-[400px]">
+                {renderChart()}
+              </div>
+            </div>
+
+            {/* Estatísticas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-400">Vendas Totais</p>
+                    <p className="text-2xl font-bold text-white mt-1">R$ {summary.totalRevenue.toLocaleString()}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+                    <DollarSign className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center">
+                    <TrendingUp className="w-4 h-4 text-green-400 mr-1" />
+                    <span className="text-sm text-green-400">+{summary.totalRevenue.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-400">Pedidos</p>
+                    <p className="text-2xl font-bold text-white mt-1">{salesData.length}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+                    <ShoppingCart className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center">
+                    <TrendingUp className="w-4 h-4 text-green-400 mr-1" />
+                    <span className="text-sm text-green-400">+{salesData.length.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-400">Clientes</p>
+                    <p className="text-2xl font-bold text-white mt-1">{salesData.length}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center">
+                    <TrendingUp className="w-4 h-4 text-green-400 mr-1" />
+                    <span className="text-sm text-green-400">+{salesData.length.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-400">Ticket Médio</p>
+                    <p className="text-2xl font-bold text-white mt-1">R$ {summary.totalRevenue / salesData.length}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+                    <CreditCard className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center">
+                    <TrendingUp className="w-4 h-4 text-green-400 mr-1" />
+                    <span className="text-sm text-green-400">+{summary.totalRevenue.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="flex gap-4">
-            <button
-              onClick={() => handleModeChange('2d')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors ${
-                mode === '2d'
-                  ? 'bg-blue-600 text-white font-semibold shadow-md'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              <Eye className="w-6 h-6" />
-              2D
-            </button>
-            <button
-              onClick={() => handleModeChange('3d')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors ${
-                mode === '3d'
-                  ? 'bg-purple-600 text-white font-semibold shadow-md'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              <Box className="w-6 h-6" />
-              3D
-            </button>
-            <button
-              onClick={() => handleModeChange('ar')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors ${
-                mode === 'ar'
-                  ? 'bg-green-600 text-white font-semibold shadow-md'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              <Camera className="w-6 h-6" />
-              AR
-            </button>
-          </div>
-        </div>
-
-        <div className="flex gap-8">
-          {isPanelOpen && (
-            <div className="w-80 bg-gray-800 p-6 rounded-2xl shadow-lg">
-              <h3 className="font-semibold text-white mb-6">Configurações</h3>
-              <div className="space-y-6">
+          {/* Painel Lateral */}
+          <div className="space-y-6">
+            {/* Filtros */}
+            <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Filtros</h2>
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Período</label>
+                  <label htmlFor="timePeriod" className="block text-sm text-gray-400 mb-2">Período</label>
                   <select
+                    id="timePeriod"
                     value={selectedTimePeriod}
                     onChange={(e) => setSelectedTimePeriod(e.target.value)}
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    title="Selecione o período"
                   >
-                    <option value="1M">Último Mês</option>
-                    <option value="3M">3 Meses</option>
-                    <option value="6M">6 Meses</option>
-                    <option value="1Y">1 Ano</option>
+                    <option value="day">Hoje</option>
+                    <option value="week">Esta Semana</option>
+                    <option value="month">Este Mês</option>
+                    <option value="year">Este Ano</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Métrica</label>
+                  <label htmlFor="metric" className="block text-sm text-gray-400 mb-2">Categoria</label>
                   <select
+                    id="metric"
                     value={selectedMetric}
-                    onChange={(e) => setSelectedMetric(e.target.value)}
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    onChange={(e) => setSelectedMetric(e.target.value as MetricKey)}
+                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    title="Selecione a métrica"
                   >
                     <option value="revenue">Receita</option>
                     <option value="profit">Lucro</option>
                     <option value="units">Unidades</option>
                   </select>
                 </div>
-
-                <div className="pt-6 border-t border-gray-700">
-                  <h4 className="font-medium text-white mb-3">Filtros Rápidos</h4>
-                  <div className="space-y-2">
-                    <button className="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-gray-300">
-                      Por Região
-                    </button>
-                    <button className="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-gray-300">
-                      Por Categoria
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 border-t border-gray-700">
-                  <h4 className="font-medium text-white mb-3">Ações Rápidas</h4>
-                  <div className="space-y-2">
-                    <button
-                      onClick={handleGenerateReport}
-                      className="w-full text-left px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors text-white font-medium"
-                    >
-                      Gerar Relatório
-                    </button>
-                    <button
-                      onClick={handleShareDashboard}
-                      className="w-full text-left px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors text-white font-medium"
-                    >
-                      Compartilhar Dashboard
-                    </button>
-                  </div>
-                </div>
-
-                {renderDataSummary()}
+                <button
+                  onClick={handleGenerateReport}
+                  className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-colors"
+                >
+                  Gerar Relatório
+                </button>
               </div>
             </div>
-          )}
 
-          <div className="flex-1 relative bg-gray-800 rounded-2xl p-6 shadow-lg">
-            {isLoading && renderLoadingOverlay()}
-            {mode === 'ar' ? renderAREnvironment() : renderChart()}
-
-            <div className="flex gap-4 mt-6">
-              <button
-                onClick={() => handleChartTypeToggle('bar')}
-                className={`px-4 py-2 rounded-full transition-colors ${
-                  chartType === 'bar'
-                    ? 'bg-blue-600 text-white font-semibold shadow-md'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Gráfico de Barras
-              </button>
-              <button
-                onClick={() => handleChartTypeToggle('line')}
-                className={`px-4 py-2 rounded-full transition-colors ${
-                  chartType === 'line'
-                    ? 'bg-blue-600 text-white font-semibold shadow-md'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Gráfico de Linhas
-              </button>
+            {/* Produtos Mais Vendidos */}
+            <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Produtos Mais Vendidos</h2>
+              <div className="space-y-4">
+                {salesData.map((item) => (
+                  <div
+                    key={item.month}
+                    className="flex items-center justify-between p-4 bg-gray-700 rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                        <Box className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-white">{item.month}</p>
+                        <p className="text-sm text-gray-400">{item.category}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-white">R$ {item.revenue.toLocaleString()}</p>
+                      <p className="text-sm text-gray-400">{item.units} vendas</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de compartilhamento */}
+      {/* Modal de Compartilhamento */}
       {showShareModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-          <div className="bg-gray-900 rounded-2xl p-8 shadow-lg max-w-md w-full">
-            <h3 className="text-2xl font-bold text-white mb-4">Compartilhar Dashboard</h3>
-            <p className="text-gray-300 mb-4">Copie o link abaixo para compartilhar:</p>
-            <input
-              type="text"
-              readOnly
-              value="https://dashboard.example.com/shared-link"
-              className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-gray-200"
-            />
-            <div className="mt-6 flex justify-end">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-xl shadow-lg p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">Compartilhar Dashboard</h2>
               <button
                 onClick={() => setShowShareModal(false)}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
+                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                title="Fechar modal"
               >
-                Fechar
+                <X className="w-6 h-6 text-gray-400" />
               </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="shareLink" className="block text-sm text-gray-400 mb-2">Link do Dashboard</label>
+                <div className="flex gap-2">
+                  <input
+                    id="shareLink"
+                    type="text"
+                    value="https://visuar.example.com/dashboard/123"
+                    readOnly
+                    className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    title="Link para compartilhar"
+                  />
+                  <button
+                    onClick={() => {/* Implementar cópia */}}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-colors"
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => {/* Implementar compartilhamento */}}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-colors"
+                >
+                  Compartilhar
+                </button>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay de Loading */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="flex items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent"></div>
+              <p className="text-white">Carregando...</p>
             </div>
           </div>
         </div>

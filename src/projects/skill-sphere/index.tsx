@@ -120,18 +120,23 @@ const SkillSphereDashboard: React.FC = () => {
   // Modal de detalhes da habilidade
   const renderSkillModal = () => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+      <div className="bg-gray-800/95 rounded-2xl p-6 max-w-md w-full border border-gray-700 shadow-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-gray-800">{selectedSkill?.name}</h3>
-          <button onClick={() => setShowSkillModal(false)}>
-            <X className="w-6 h-6 text-gray-600" />
+          <h3 className="text-xl font-bold text-white">{selectedSkill?.name}</h3>
+          <button 
+            onClick={() => setShowSkillModal(false)} 
+            className="text-gray-400 hover:text-gray-300"
+            aria-label="Fechar modal"
+            title="Fechar modal"
+          >
+            <X className="w-6 h-6" />
           </button>
         </div>
         {selectedSkill && (
           <div>
-            <p className="text-gray-600 mb-2">Nível: <span className="font-medium">{selectedSkill.level}</span></p>
-            <p className="text-gray-600 mb-4">Progresso: <span className="font-medium">{selectedSkill.progress}%</span></p>
-            <div className="w-full h-2 bg-gray-200 rounded-full">
+            <p className="text-gray-300 mb-2">Nível: <span className="font-medium text-white">{selectedSkill.level}</span></p>
+            <p className="text-gray-300 mb-4">Progresso: <span className="font-medium text-white">{selectedSkill.progress}%</span></p>
+            <div className="w-full h-2 bg-gray-700 rounded-full">
               <div className="h-full bg-blue-500 rounded-full" style={{ width: `${selectedSkill.progress}%` }} />
             </div>
           </div>
@@ -139,7 +144,7 @@ const SkillSphereDashboard: React.FC = () => {
         <div className="mt-6 flex justify-end">
           <button
             onClick={() => setShowSkillModal(false)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+            className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
           >
             Fechar
           </button>
@@ -151,41 +156,41 @@ const SkillSphereDashboard: React.FC = () => {
   // Modal para adicionar nova habilidade
   const renderAddSkillModal = () => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Adicionar Nova Habilidade</h3>
+      <div className="bg-gray-800/95 rounded-2xl p-6 max-w-md w-full border border-gray-700 shadow-2xl">
+        <h3 className="text-xl font-bold text-white mb-4">Adicionar Nova Habilidade</h3>
         <div className="space-y-4">
           <input
             type="text"
             placeholder="Nome da habilidade"
             value={newSkillName}
             onChange={(e) => setNewSkillName(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <input
             type="text"
             placeholder="Nível (Iniciante, Intermediário, Avançado)"
             value={newSkillLevel}
             onChange={(e) => setNewSkillLevel(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <input
             type="number"
             placeholder="Progresso (%)"
             value={newSkillProgress}
             onChange={(e) => setNewSkillProgress(Number(e.target.value))}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
         <div className="mt-6 flex justify-end gap-4">
           <button
             onClick={() => setShowAddSkillModal(false)}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400 transition"
+            className="px-4 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition"
           >
             Cancelar
           </button>
           <button
             onClick={handleAddSkill}
-            className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
+            className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
           >
             Adicionar
           </button>
@@ -194,25 +199,15 @@ const SkillSphereDashboard: React.FC = () => {
     </div>
   );
 
-  // Renderiza um resumo dos dados (simulação)
-  const renderDataSummary = () => (
-    <div className="p-6 bg-gray-800 rounded-2xl shadow-lg border border-gray-700 mt-6">
-      <h3 className="text-xl font-bold text-white mb-4">Resumo dos Dados</h3>
-      <p className="text-gray-300">Receita Total: <span className="font-semibold">R$ 0</span></p>
-      <p className="text-gray-300">Lucro Total: <span className="font-semibold">R$ 0</span></p>
-      <p className="text-gray-300">Média de Unidades: <span className="font-semibold">0</span></p>
-    </div>
-  );
-
   return (
-    <div className="w-full max-w-7xl mx-auto p-8 bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen relative">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800">
       {toastMessage && (
         <div className="fixed top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg transition-opacity">
           {toastMessage}
         </div>
       )}
       {/* Header */}
-      <div className="bg-gray-900 rounded-2xl shadow-lg p-8 mb-8">
+      <div className="bg-gray-800 rounded-2xl shadow-lg p-8 mb-8 border border-gray-700">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">SkillSphere</h1>
@@ -232,10 +227,10 @@ const SkillSphereDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-12 gap-6">
+      <div className="flex-grow grid grid-cols-12 gap-6">
         {/* Sidebar */}
         <div className="col-span-3">
-          <div className="bg-gray-800 rounded-2xl shadow-lg p-4">
+          <div className="bg-gray-800 rounded-2xl shadow-lg p-4 border border-gray-700">
             <nav className="space-y-2">
               <button
                 onClick={() => setActiveTab('roadmap')}
@@ -307,7 +302,7 @@ const SkillSphereDashboard: React.FC = () => {
                 {/* Recomendações */}
                 <div className="space-y-4">
                   {currentPath.recommendations.map((item, index) => (
-                    <div key={index} className="border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                    <div key={index} className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           {item.type === 'course' && <Monitor className="w-5 h-5 text-purple-500" />}
@@ -341,7 +336,7 @@ const SkillSphereDashboard: React.FC = () => {
                   {currentPath.skills.map((skill, index) => (
                     <div
                       key={index}
-                      className="border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+                      className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
                       onClick={() => openSkillModal(skill)}
                     >
                       <div className="flex justify-between items-center mb-4">
@@ -363,7 +358,7 @@ const SkillSphereDashboard: React.FC = () => {
                     </div>
                   ))}
                   <div
-                    className="border-2 border-dashed border-gray-600 rounded-lg p-6 flex items-center justify-center cursor-pointer hover:bg-gray-700 transition-colors"
+                    className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-6 flex items-center justify-center cursor-pointer hover:bg-gray-700/70 transition-colors"
                     onClick={() => setShowAddSkillModal(true)}
                   >
                     <div className="text-center">
@@ -379,7 +374,7 @@ const SkillSphereDashboard: React.FC = () => {
               <div>
                 <h2 className="text-xl font-bold text-white mb-6">Recursos Recomendados</h2>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                  <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
                     <div className="bg-purple-700 w-max p-3 rounded-lg mb-4">
                       <Monitor className="w-6 h-6 text-purple-300" />
                     </div>
@@ -392,7 +387,7 @@ const SkillSphereDashboard: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                  <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
                     <div className="bg-green-700 w-max p-3 rounded-lg mb-4">
                       <Code className="w-6 h-6 text-green-300" />
                     </div>
@@ -405,7 +400,7 @@ const SkillSphereDashboard: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                  <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:shadow-xl transition-shadow">
                     <div className="bg-blue-700 w-max p-3 rounded-lg mb-4">
                       <Book className="w-6 h-6 text-blue-300" />
                     </div>

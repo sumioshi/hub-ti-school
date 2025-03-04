@@ -1,4 +1,6 @@
 import { ProjectCard } from '../components/project-card';
+import { Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 const DEMO_PROJECTS = [
   {
@@ -35,13 +37,21 @@ const DEMO_PROJECTS = [
     description: 'Plataforma de dashboards customizáveis com edição drag-and-drop e integração em tempo real.',
     tags: ['React', 'TypeScript', 'TailwindCSS', 'Dashboard'],
     image: 'https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&w=800&q=80'
+  },
+  // Adicionando o SupplyFit
+  {
+    id: 'supplyfit',
+    title: 'SupplyFit',
+    description: 'O Gympass dos suplementos: assinatura mensal para retirar suplementos em lojas parceiras.',
+    tags: ['React', 'Subscription', 'Fitness', 'E-commerce'],
+    image: 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?auto=format&fit=crop&w=800&q=80'
   }
 ];
 
 export function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800">
-      <div className="container px-4 py-16 sm:px-8">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-6 max-w-3xl mx-auto text-center mb-16">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Project Showcase
@@ -50,6 +60,17 @@ export function Home() {
             Explore nossa coleção de projetos frontend interativos e inovadores
           </p>
           <div className="w-32 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto rounded-full"></div>
+          
+          {/* Link para o novo Hub de Ideias com AI */}
+          <div className="pt-4">
+            <Link 
+              to="/hub" 
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+            >
+              <Sparkles className="h-5 w-5" />
+              <span className="font-medium">Explore o Hub de Ideias com IA</span>
+            </Link>
+          </div>
         </div>
         
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 relative">

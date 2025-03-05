@@ -18,41 +18,51 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
     <Link
       to={`/projects/${project.id}`}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm transition-all hover:border-gray-700 hover:shadow-2xl hover:shadow-purple-500/10 block",
+        "group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm transition-all hover:border-gray-700 hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:ring-offset-2 focus:ring-offset-gray-900",
         className
       )}
+      aria-label={`Ver projeto ${project.title}`}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-      <div className="aspect-video w-full overflow-hidden rounded-t-xl">
+      <span className="sr-only">Ver projeto {project.title}</span>
+      
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      
+      <div className="aspect-video w-full overflow-hidden">
         <img
           src={project.image}
           alt={project.title}
-          className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
         />
       </div>
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+      
+      <div className="p-5">
+        <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors duration-300">
           {project.title}
         </h3>
-        <p className="mt-3 text-gray-400 line-clamp-2">{project.description}</p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
+        <p className="mt-2 text-sm text-gray-400 line-clamp-2">{project.description}</p>
+        
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {project.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center rounded-full bg-gray-800/80 px-3 py-1 text-xs font-medium text-gray-300 border border-gray-700/50 backdrop-blur-sm"
+              className="inline-flex items-center rounded-full bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-300"
             >
               {tag}
             </span>
           ))}
+          {project.tags.length > 3 && (
+            <span className="inline-flex items-center rounded-full bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-300">
+              +{project.tags.length - 3}
+            </span>
+          )}
         </div>
-        <div className="mt-6">
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer"
-            onClick={() => window.location.href = `/projects/${project.id}`}
-          >
-            Ver Projeto
-            <ArrowRight className="h-4 w-4" />
-          </div>
+        
+        <div className="mt-5 pt-4 border-t border-gray-800/50">
+          <span className="text-sm font-medium text-blue-400 group-hover:text-blue-300 transition-colors flex items-center gap-1.5">
+            Ver projeto
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+          </span>
         </div>
       </div>
     </Link>

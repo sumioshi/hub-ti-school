@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Code, Eye, GitBranch, Sparkles, Layers, Search, Settings, 
-  User, Bell, Plus, Save, Copy, Play, Mic, Send, 
-  Star, Folder, ChevronDown, ChevronRight, MoreVertical, Clock,
-  Zap, MessageSquare, Calendar, BookOpen, UploadCloud, PanelLeft,
-  PanelRight, X, ExternalLink, Download, Grid, List, Maximize2, 
-  HelpCircle, BarChart2, ShieldCheck, RotateCcw, Check, Package,
-  Command, Users, ArrowLeft
+import {
+  Code, Eye, GitBranch, Sparkles, Layers, Search, Settings,
+  User, Bell, Plus, Save, Copy, Mic, Send,
+  Star, Folder, MoreVertical, Clock,
+  Zap, MessageSquare, PanelLeft,
+  PanelRight, X, Grid, List, Maximize2,
+  HelpCircle, Check, Users, ArrowLeft
 } from 'lucide-react';
+
+// Definir interface para o tipo de projeto
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  date: string;
+  status: string;
+  tags: string[];
+  // Adicione outras propriedades conforme necessário
+}
 
 // Componente principal do Hub
 export function IdeaHub() {
   const [activeView, setActiveView] = useState('dashboard');
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState('preview');
   const [ideaInput, setIdeaInput] = useState('');
   const [processing, setProcessing] = useState(false);
@@ -25,7 +35,32 @@ export function IdeaHub() {
   const [demoStep, setDemoStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState('gpt4');
   const [showChat, setShowChat] = useState(false);
-  
+
+  // Fixar botões sem texto discernível
+  useEffect(() => {
+    const fixAccessibility = () => {
+      const buttonsWithoutText = Array.from(document.querySelectorAll('button:not([title]):not([aria-label])'))
+        .filter(button => {
+          const text = button.textContent?.trim() || '';
+          return text === '';
+        });
+      
+      buttonsWithoutText.forEach((button, index) => {
+        button.setAttribute('title', `Botão de ação ${index + 1}`);
+        button.setAttribute('aria-label', `Botão de ação ${index + 1}`);
+      });
+    };
+
+    // Executa imediatamente
+    fixAccessibility();
+    
+    // E também após cada mudança de conteúdo 
+    const observer = new MutationObserver(fixAccessibility);
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => observer.disconnect();
+  }, []);
+
   // Dados simulados para visualização
   const salesData = [
     { date: 'Dia 1', sales: 850, orders: 25 },
@@ -82,9 +117,20 @@ export function IdeaHub() {
       starred: false,
       preview: "/api/placeholder/800/600",
       status: "in_progress"
+    },
+    {
+      id: 5,
+      name: "Gerenciador de Relacionamentos",
+      description: "Aplicativo para gerenciar contatos e interações",
+      date: "12 Mar 2024",
+      thumbnail: "https://picsum.photos/320/180?random=5",
+      tags: ["CRM", "Contatos", "Interações"],
+      starred: false,
+      preview: "/api/placeholder/800/600",
+      status: "in_progress"
     }
   ];
-  
+
   const categories = [
     { id: 'all', name: 'Todos Projetos', count: 12 },
     { id: 'recent', name: 'Recentes', count: 4 },
@@ -92,14 +138,14 @@ export function IdeaHub() {
     { id: 'shared', name: 'Compartilhados', count: 3 },
     { id: 'templates', name: 'Templates', count: 8 }
   ];
-  
+
   const aiModels = [
     { id: 'gpt4', name: 'GPT-4 Turbo', provider: 'OpenAI', color: 'from-green-500 to-emerald-600' },
     { id: 'claude', name: 'Claude 3 Opus', provider: 'Anthropic', color: 'from-purple-500 to-violet-600' },
     { id: 'codellama', name: 'Code Llama', provider: 'Meta', color: 'from-blue-500 to-cyan-600' },
     { id: 'starcoder', name: 'StarCoder 2', provider: 'Hugging Face', color: 'from-amber-500 to-red-600' }
   ];
-  
+
   const sampleCode = `// React component generated from your description
 import React, { useState, useEffect } from 'react';
 import './EcommerceStyles.css';
@@ -174,12 +220,11 @@ const EcommerceDashboard = () => {
         <div className="metric-card">
           <h3>Avg. Order Value</h3>
           <p className="metric-value">
-            ${ 
-              salesData.length ? Math.round(
-                salesData.reduce((sum, day) => sum + day.sales, 0) / 
-                salesData.reduce((sum, day) => sum + day.orders, 0)
-              ) : 0 
-            }
+            ${salesData.length ? Math.round(
+    salesData.reduce((sum, day) => sum + day.sales, 0) /
+    salesData.reduce((sum, day) => sum + day.orders, 0)
+  ) : 0
+    }
           </p>
           <p className="metric-label">Past {dateRange === 'weekly' ? '7' : '30'} days</p>
         </div>
@@ -247,7 +292,7 @@ export default EcommerceDashboard;`;
   const startProcessing = () => {
     if (ideaInput.trim() !== '') {
       setProcessing(true);
-      
+
       // Simulando o processamento da IA
       setTimeout(() => {
         setProcessing(false);
@@ -270,8 +315,8 @@ export default EcommerceDashboard;`;
         // Simular processamento
         () => { setProcessing(true); },
         // Mostrar resultado
-        () => { 
-          setProcessing(false); 
+        () => {
+          setProcessing(false);
           setActiveView('editor');
           setSelectedProject(projects[0]);
         },
@@ -285,7 +330,7 @@ export default EcommerceDashboard;`;
 
       let currentStep = 0;
       let demoInterval: NodeJS.Timeout | null = null;
-      
+
       demoInterval = setInterval(() => {
         if (currentStep < demoSteps.length) {
           demoSteps[currentStep]();
@@ -318,7 +363,7 @@ export default EcommerceDashboard;`;
               <p className="text-gray-400 text-xs">Powered by AI</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setMenuVisible(false)}
             className="text-gray-400 hover:text-white p-1 rounded-md hover:bg-gray-800"
             aria-label="Fechar menu"
@@ -327,7 +372,7 @@ export default EcommerceDashboard;`;
             <X size={20} />
           </button>
         </div>
-        
+
         <div className="p-4">
           <button
             onClick={() => setActiveView('create')}
@@ -338,7 +383,7 @@ export default EcommerceDashboard;`;
             <span>Nova Ideia</span>
           </button>
         </div>
-        
+
         <nav className="flex-1 overflow-y-auto p-4">
           <div className="mb-6">
             <ul className="space-y-1">
@@ -354,6 +399,8 @@ export default EcommerceDashboard;`;
                       setSelectedProject(null);
                     }}
                     className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${activeView === item.id ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                    title={item.label}
+                    aria-label={item.label}
                   >
                     <span className="mr-3">{item.icon}</span>
                     <span>{item.label}</span>
@@ -362,13 +409,17 @@ export default EcommerceDashboard;`;
               ))}
             </ul>
           </div>
-          
+
           <div className="mb-6">
             <h3 className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2 px-3">Categorias</h3>
             <ul className="space-y-1">
               {categories.map(category => (
                 <li key={category.id}>
-                  <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                  <button 
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+                    title={`Categoria ${category.name}`}
+                    aria-label={`Categoria ${category.name}`}
+                  >
                     <span>{category.name}</span>
                     <span className="bg-gray-800 text-gray-400 text-xs rounded-full py-0.5 px-2">
                       {category.count}
@@ -378,13 +429,13 @@ export default EcommerceDashboard;`;
               ))}
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2 px-3">Recentes</h3>
             <ul className="space-y-1">
               {projects.slice(0, 3).map(project => (
                 <li key={project.id}>
-                  <button 
+                  <button
                     onClick={() => {
                       setSelectedProject(project);
                       setActiveView('editor');
@@ -399,7 +450,7 @@ export default EcommerceDashboard;`;
             </ul>
           </div>
         </nav>
-        
+
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center">
             <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center">
@@ -409,7 +460,11 @@ export default EcommerceDashboard;`;
               <p className="text-white text-sm">Alex Martins</p>
               <p className="text-gray-400 text-xs">Plano Pro</p>
             </div>
-            <button className="ml-auto text-gray-400 hover:text-white">
+            <button 
+              className="ml-auto text-gray-400 hover:text-white"
+              title="Configurações"
+              aria-label="Configurações"
+            >
               <Settings size={18} />
             </button>
           </div>
@@ -428,8 +483,8 @@ export default EcommerceDashboard;`;
         <ArrowLeft className="h-4 w-4" />
         Back to Projects
       </Link>
-      
-      <button 
+
+      <button
         onClick={() => setMenuVisible(!menuVisible)}
         className="text-gray-400 hover:text-white mr-4 p-1 rounded hover:bg-gray-800"
         aria-label={menuVisible ? "Fechar menu" : "Abrir menu"}
@@ -437,20 +492,22 @@ export default EcommerceDashboard;`;
       >
         {menuVisible ? <PanelLeft size={20} /> : <PanelRight size={20} />}
       </button>
-      
+
       {activeView === 'dashboard' && (
         <div className="flex-1 flex items-center">
           <h1 className="text-white text-lg font-medium">Meus Projetos</h1>
           <div className="ml-auto flex items-center">
             <div className="relative mr-4">
+              <label htmlFor="search-projects" className="sr-only">Buscar projetos</label>
               <input
+                id="search-projects"
                 type="text"
                 placeholder="Buscar projetos..."
                 className="bg-gray-800 border border-gray-700 text-gray-200 rounded-lg py-1.5 pl-9 pr-3 text-sm w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
             </div>
-            
+
             <div className="flex space-x-2">
               <button
                 onClick={() => setProjectView('grid')}
@@ -470,11 +527,11 @@ export default EcommerceDashboard;`;
           </div>
         </div>
       )}
-      
+
       {activeView === 'create' && (
         <h1 className="text-white text-lg font-medium">Nova Ideia</h1>
       )}
-      
+
       {activeView === 'editor' && selectedProject && (
         <div className="flex-1 flex items-center">
           <div>
@@ -490,7 +547,7 @@ export default EcommerceDashboard;`;
               </div>
             </div>
           </div>
-          
+
           <div className="ml-auto flex items-center">
             <div className="flex mr-4">
               <button
@@ -514,7 +571,7 @@ export default EcommerceDashboard;`;
                 <span>Código</span>
               </button>
             </div>
-            
+
             <button
               onClick={() => alert('Projeto salvo!')}
               className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm flex items-center mr-2"
@@ -523,7 +580,7 @@ export default EcommerceDashboard;`;
               <Save size={16} className="mr-2" />
               <span>Salvar</span>
             </button>
-            
+
             <button
               onClick={() => alert('Projeto exportado para GitHub!')}
               className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm flex items-center"
@@ -535,16 +592,16 @@ export default EcommerceDashboard;`;
           </div>
         </div>
       )}
-      
+
       <div className="ml-auto flex items-center">
-        <button 
+        <button
           onClick={() => setDemoMode(true)}
           className="text-sm text-blue-500 hover:text-blue-400 mr-4"
           title="Iniciar demonstração"
         >
           Demo
         </button>
-        <button 
+        <button
           onClick={() => setShowChat(!showChat)}
           className="text-gray-400 hover:text-white mr-3 relative"
           title="Abrir chat"
@@ -552,9 +609,10 @@ export default EcommerceDashboard;`;
           <MessageSquare size={20} />
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-xs flex items-center justify-center text-white">2</span>
         </button>
-        <button 
+        <button
           className="text-gray-400 hover:text-white mr-3"
           title="Notificações"
+          aria-label="Notificações"
         >
           <Bell size={20} />
         </button>
@@ -597,12 +655,12 @@ export default EcommerceDashboard;`;
           </div>
         </div>
       </div>
-      
+
       {projectView === 'grid' ? (
         // Grid view
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {projects.map(project => (
-            <div 
+            <div
               key={project.id}
               className="bg-gray-800 rounded-xl overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all cursor-pointer"
               onClick={() => {
@@ -611,31 +669,32 @@ export default EcommerceDashboard;`;
               }}
             >
               <div className="h-40 overflow-hidden relative">
-                <img 
+                <img
                   src={project.thumbnail}
                   alt={project.name}
                   className="w-full h-full object-cover"
                 />
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     // In a real app, we would update the state here
                     console.log(`Toggling star for project: ${project.name}`);
                   }}
                   className="absolute top-2 right-2 h-7 w-7 bg-gray-900/70 rounded-full flex items-center justify-center"
+                  title="Favoritar projeto"
+                  aria-label="Favoritar projeto"
                 >
-                  <Star 
-                    size={16} 
-                    fill={project.starred ? "currentColor" : "none"} 
+                  <Star
+                    size={16}
+                    fill={project.starred ? "currentColor" : "none"}
                     className={project.starred ? "text-yellow-400" : "text-white"}
                   />
                 </button>
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent py-2 px-3">
-                  <span className={`text-xs px-2 py-0.5 rounded ${
-                    project.status === 'completed' 
-                      ? 'bg-green-900/60 text-green-400' 
+                  <span className={`text-xs px-2 py-0.5 rounded ${project.status === 'completed'
+                      ? 'bg-green-900/60 text-green-400'
                       : 'bg-blue-900/60 text-blue-400'
-                  }`}>
+                    }`}>
                     {project.status === 'completed' ? 'Completo' : 'Em Progresso'}
                   </span>
                 </div>
@@ -661,9 +720,9 @@ export default EcommerceDashboard;`;
               </div>
             </div>
           ))}
-          
+
           {/* Card para criar nova ideia */}
-          <div 
+          <div
             className="bg-gray-800 rounded-xl border-2 border-dashed border-gray-700 flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-blue-500 transition-colors"
             onClick={() => setActiveView('create')}
           >
@@ -689,8 +748,8 @@ export default EcommerceDashboard;`;
             </thead>
             <tbody>
               {projects.map(project => (
-                <tr 
-                  key={project.id} 
+                <tr
+                  key={project.id}
                   className="border-b border-gray-700 hover:bg-gray-750 cursor-pointer transition-colors"
                   onClick={() => {
                     setSelectedProject(project);
@@ -700,7 +759,7 @@ export default EcommerceDashboard;`;
                   <td className="py-3 px-4">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                        <img 
+                        <img
                           src={project.thumbnail}
                           alt={project.name}
                           className="w-full h-full object-cover"
@@ -713,11 +772,10 @@ export default EcommerceDashboard;`;
                     </div>
                   </td>
                   <td className="py-3 px-4">
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      project.status === 'completed' 
-                        ? 'bg-green-900/40 text-green-400' 
+                    <span className={`text-xs px-2 py-1 rounded ${project.status === 'completed'
+                        ? 'bg-green-900/40 text-green-400'
                         : 'bg-blue-900/40 text-blue-400'
-                    }`}>
+                      }`}>
                       {project.status === 'completed' ? 'Completo' : 'Em Progresso'}
                     </span>
                   </td>
@@ -732,21 +790,23 @@ export default EcommerceDashboard;`;
                   </td>
                   <td className="py-3 px-4 text-gray-400">{project.date}</td>
                   <td className="py-3 px-4 text-right">
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         // In a real app, we would update the state here
                         console.log(`Toggling star for project: ${project.name}`);
                       }}
                       className="text-gray-400 hover:text-yellow-400 mr-2"
+                      title="Favoritar projeto"
+                      aria-label="Favoritar projeto"
                     >
-                      <Star 
-                        size={18} 
-                        fill={project.starred ? "currentColor" : "none"} 
+                      <Star
+                        size={18}
+                        fill={project.starred ? "currentColor" : "none"}
                         className={project.starred ? "text-yellow-400" : ""}
                       />
                     </button>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         // Show options menu
@@ -772,11 +832,11 @@ export default EcommerceDashboard;`;
       <div className="mb-8">
         <h2 className="text-white text-xl font-medium mb-2">Descreva sua Ideia</h2>
         <p className="text-gray-400">
-          Explique em detalhes o projeto que você deseja criar. Quanto mais detalhada for sua descrição, 
+          Explique em detalhes o projeto que você deseja criar. Quanto mais detalhada for sua descrição,
           melhores serão os resultados gerados pela IA.
         </p>
       </div>
-      
+
       <div className="bg-gray-800 rounded-xl p-6 mb-8">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
@@ -789,14 +849,16 @@ export default EcommerceDashboard;`;
             className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <label htmlFor="idea-description" className="text-white font-medium">Descrição Detalhada</label>
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => setRecording(!recording)}
                 className={`flex items-center justify-center p-1.5 rounded-lg mr-2 ${recording ? 'bg-red-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                title="Usar microfone"
+                aria-label="Usar microfone"
               >
                 <Mic size={18} />
               </button>
@@ -813,17 +875,17 @@ export default EcommerceDashboard;`;
             className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 h-36 resize-none"
           ></textarea>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="text-white font-medium block mb-2">Modelo de IA</label>
             <div className="space-y-2">
               {aiModels.map(model => (
                 <div key={model.id} className="flex items-center p-2 rounded-lg hover:bg-gray-700 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    id={model.id} 
-                    name="aiModel" 
+                  <input
+                    type="radio"
+                    id={model.id}
+                    name="aiModel"
                     checked={selectedModel === model.id}
                     onChange={() => setSelectedModel(model.id)}
                     className="mr-3 accent-blue-500"
@@ -841,7 +903,7 @@ export default EcommerceDashboard;`;
               ))}
             </div>
           </div>
-          
+
           <div>
             <label className="text-white font-medium block mb-2">Configurações</label>
             <div className="space-y-3">
@@ -851,29 +913,47 @@ export default EcommerceDashboard;`;
                   <p className="text-gray-400 text-xs">Incluir comentários explicativos</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" value="" className="sr-only peer" defaultChecked />
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    defaultChecked 
+                    id="comentarios"
+                    aria-label="Ativar código comentado"
+                  />
                   <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
-              
+
               <div className="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
                 <div>
                   <p className="text-white text-sm">Design Responsivo</p>
                   <p className="text-gray-400 text-xs">Adaptar para todos dispositivos</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" value="" className="sr-only peer" defaultChecked />
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    defaultChecked 
+                    id="responsivo"
+                    aria-label="Ativar design responsivo"
+                  />
                   <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
-              
+
               <div className="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
                 <div>
                   <p className="text-white text-sm">Interações Avançadas</p>
                   <p className="text-gray-400 text-xs">Incluir animações e eventos</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" value="" className="sr-only peer" />
+                  <input 
+                    type="checkbox" 
+                    id="advanced-interactions"
+                    name="advanced-interactions"
+                    className="sr-only peer"
+                    aria-label="Ativar interações avançadas"
+                  />
                   <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
@@ -881,7 +961,7 @@ export default EcommerceDashboard;`;
           </div>
         </div>
       </div>
-      
+
       <div className="flex justify-between items-center">
         <button
           onClick={() => setActiveView('dashboard')}
@@ -889,15 +969,14 @@ export default EcommerceDashboard;`;
         >
           <span>Cancelar</span>
         </button>
-        
+
         <button
           onClick={startProcessing}
           disabled={ideaInput.trim() === '' || processing}
-          className={`px-6 py-2 rounded-lg flex items-center ${
-            ideaInput.trim() === '' || processing
+          className={`px-6 py-2 rounded-lg flex items-center ${ideaInput.trim() === '' || processing
               ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
               : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90'
-          }`}
+            }`}
         >
           {processing ? (
             <>
@@ -918,7 +997,7 @@ export default EcommerceDashboard;`;
   // Renderizar editor de projeto
   const renderEditor = () => {
     if (!selectedProject) return null;
-    
+
     return (
       <div className="h-[calc(100vh-124px)] flex">
         {/* Área de visualização/código */}
@@ -935,7 +1014,11 @@ export default EcommerceDashboard;`;
                   </div>
                   <div className="flex items-center text-xs text-gray-400">
                     <span className="px-2 py-1 rounded bg-gray-800 mr-2">localhost:3000</span>
-                    <button className="text-gray-400 hover:text-white p-1">
+                    <button 
+                      className="text-gray-400 hover:text-white p-1" 
+                      title="Maximizar janela" 
+                      aria-label="Maximizar janela"
+                    >
                       <Maximize2 size={14} />
                     </button>
                   </div>
@@ -945,7 +1028,7 @@ export default EcommerceDashboard;`;
                     {/* Versão simplificada do dashboard para preview */}
                     <div className="bg-white p-4 rounded-lg shadow mb-6">
                       <h1 className="text-xl font-bold text-gray-800 mb-4">E-commerce Dashboard</h1>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                           <h3 className="text-sm font-medium text-gray-600">Total Sales</h3>
@@ -954,7 +1037,7 @@ export default EcommerceDashboard;`;
                           </p>
                           <p className="text-xs text-gray-500">Past 7 days</p>
                         </div>
-                        
+
                         <div className="bg-green-50 p-4 rounded-lg border border-green-100">
                           <h3 className="text-sm font-medium text-gray-600">Orders</h3>
                           <p className="text-2xl font-bold text-gray-800">
@@ -962,14 +1045,14 @@ export default EcommerceDashboard;`;
                           </p>
                           <p className="text-xs text-gray-500">Past 7 days</p>
                         </div>
-                        
+
                         <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
                           <h3 className="text-sm font-medium text-gray-600">Avg. Order Value</h3>
                           <p className="text-2xl font-bold text-gray-800">
-                            ${Math.round(
-                              salesData.reduce((sum, day) => sum + day.sales, 0) / 
+                            ${(
+                              salesData.reduce((sum, day) => sum + day.sales, 0) /
                               salesData.reduce((sum, day) => sum + day.orders, 0)
-                            )}
+                            ).toFixed(2)}
                           </p>
                           <p className="text-xs text-gray-500">Past 7 days</p>
                         </div>
@@ -980,8 +1063,8 @@ export default EcommerceDashboard;`;
                         <div className="h-48 flex items-end space-x-2">
                           {salesData.map((day, index) => (
                             <div key={index} className="flex flex-col items-center flex-1">
-                              <div 
-                                className="bg-blue-500 w-full rounded-t-sm" 
+                              <div
+                                className="bg-blue-500 w-full rounded-t-sm"
                                 style={{ height: `${day.sales / 14}px` }}
                               ></div>
                               <p className="text-xs text-gray-500 mt-1">{day.date}</p>
@@ -989,7 +1072,7 @@ export default EcommerceDashboard;`;
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="bg-white">
                         <h2 className="font-medium text-gray-700 mb-2">Recent Orders</h2>
                         <div className="overflow-x-auto">
@@ -1011,9 +1094,8 @@ export default EcommerceDashboard;`;
                                   <td className="px-4 py-2 text-sm text-gray-500">March {10 - i}, 2024</td>
                                   <td className="px-4 py-2 text-sm text-gray-800">${Math.floor(Math.random() * 300) + 50}</td>
                                   <td className="px-4 py-2">
-                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                      ['bg-green-100 text-green-800', 'bg-yellow-100 text-yellow-800', 'bg-green-100 text-green-800', 'bg-yellow-100 text-yellow-800', 'bg-blue-100 text-blue-800'][i]
-                                    }`}>
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${['bg-green-100 text-green-800', 'bg-yellow-100 text-yellow-800', 'bg-green-100 text-green-800', 'bg-yellow-100 text-yellow-800', 'bg-blue-100 text-blue-800'][i]
+                                      }`}>
                                       {['Completed', 'Processing', 'Completed', 'Processing', 'Shipped'][i]}
                                     </span>
                                   </td>
@@ -1035,10 +1117,17 @@ export default EcommerceDashboard;`;
                     <span className="text-gray-400 text-sm">EcommerceDashboard.jsx</span>
                   </div>
                   <div className="flex items-center">
-                    <button className="text-gray-400 hover:text-white p-1 mr-1">
+                    <button className="text-gray-400 hover:text-white p-1 mr-1"
+                      title="Copiar código"
+                      aria-label="Copiar código"
+                    >
                       <Copy size={14} />
                     </button>
-                    <button className="text-gray-400 hover:text-white p-1">
+                    <button 
+                      className="text-gray-400 hover:text-white p-1" 
+                      title="Maximizar janela" 
+                      aria-label="Maximizar janela"
+                    >
                       <Maximize2 size={14} />
                     </button>
                   </div>
@@ -1052,15 +1141,17 @@ export default EcommerceDashboard;`;
             )}
           </div>
         </div>
-        
+
         {/* Painel lateral de código/sugestões */}
         {showCodePanel && (
           <div className="w-96 border-l border-gray-700 flex flex-col h-full">
             <div className="bg-gray-900 p-4 border-b border-gray-700 flex items-center justify-between">
               <h3 className="text-white font-medium">Sugestões de IA</h3>
-              <button 
+              <button
                 onClick={() => setShowCodePanel(false)}
                 className="text-gray-400 hover:text-white"
+                title="Fechar painel"
+                aria-label="Fechar painel"
               >
                 <X size={18} />
               </button>
@@ -1076,12 +1167,15 @@ export default EcommerceDashboard;`;
                     Adicione filtros de categorias para permitir analisar o desempenho por tipo de produto.
                   </p>
                   <div className="flex justify-end">
-                    <button className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 bg-blue-900/30 rounded">
+                    <button className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 bg-blue-900/30 rounded"
+                      title="Aplicar esta sugestão"
+                      aria-label="Aplicar esta sugestão"
+                    >
                       Aplicar Sugestão
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-750 border border-gray-700 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <Code size={16} className="text-purple-400 mr-2" />
@@ -1091,12 +1185,15 @@ export default EcommerceDashboard;`;
                     Use React.memo para componentes da tabela de pedidos para melhor performance.
                   </p>
                   <div className="flex justify-end">
-                    <button className="text-xs text-purple-400 hover:text-purple-300 px-2 py-1 bg-purple-900/30 rounded">
+                    <button className="text-xs text-purple-400 hover:text-purple-300 px-2 py-1 bg-purple-900/30 rounded"
+                      title="Otimizar código"
+                      aria-label="Otimizar código"
+                    >
                       Otimizar Código
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-750 border border-gray-700 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <HelpCircle size={16} className="text-yellow-400 mr-2" />
@@ -1106,21 +1203,29 @@ export default EcommerceDashboard;`;
                     Há um potencial problema de renderização quando não há dados disponíveis.
                   </p>
                   <div className="flex justify-end">
-                    <button className="text-xs text-yellow-400 hover:text-yellow-300 px-2 py-1 bg-yellow-900/30 rounded">
+                    <button className="text-xs text-yellow-400 hover:text-yellow-300 px-2 py-1 bg-yellow-900/30 rounded"
+                      title="Corrigir problema"
+                      aria-label="Corrigir problema"
+                    >
                       Corrigir Problema
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="mt-6">
                   <h4 className="text-white font-medium mb-3">Pergunte à IA</h4>
                   <div className="relative">
+                    <label htmlFor="ai-question" className="sr-only">Pergunte à IA</label>
                     <input
+                      id="ai-question"
                       type="text"
                       placeholder="Ex: Como adicionar um filtro de data?"
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg py-2 pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
+                    <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      title="Enviar mensagem"
+                      aria-label="Enviar mensagem"
+                    >
                       <Send size={16} />
                     </button>
                   </div>
@@ -1132,11 +1237,11 @@ export default EcommerceDashboard;`;
       </div>
     );
   };
-  
+
   // Renderizar Chat IA
   const renderChat = () => {
     if (!showChat) return null;
-    
+
     return (
       <div className="fixed bottom-4 right-4 w-80 bg-gray-900 rounded-xl shadow-lg border border-gray-700 z-40">
         <div className="p-3 border-b border-gray-700 flex items-center justify-between">
@@ -1146,9 +1251,11 @@ export default EcommerceDashboard;`;
             </div>
             <h3 className="ml-2 text-white font-medium">Assistente IA</h3>
           </div>
-          <button 
+          <button
             onClick={() => setShowChat(false)}
             className="text-gray-400 hover:text-white"
+            title="Fechar chat"
+            aria-label="Fechar chat"
           >
             <X size={18} />
           </button>
@@ -1162,13 +1269,13 @@ export default EcommerceDashboard;`;
               Olá! Como posso ajudar com seu projeto hoje?
             </div>
           </div>
-          
+
           <div className="flex justify-end mb-3">
             <div className="bg-blue-900/50 rounded-lg p-2 text-gray-200 text-sm max-w-[85%]">
               Como faço para adicionar um sistema de filtros no dashboard?
             </div>
           </div>
-          
+
           <div className="flex mb-3">
             <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
               <Sparkles size={12} className="text-white" />
@@ -1180,16 +1287,24 @@ export default EcommerceDashboard;`;
         </div>
         <div className="p-3 border-t border-gray-700">
           <div className="relative">
+            <label htmlFor="chat-input" className="sr-only">Digite sua pergunta</label>
             <input
+              id="chat-input"
               type="text"
               placeholder="Digite sua pergunta..."
               className="w-full bg-gray-800 border border-gray-700 text-gray-200 rounded-lg py-2 pl-3 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex">
-              <button className="text-gray-400 hover:text-white mr-1">
+              <button className="text-gray-400 hover:text-white mr-1"
+                title="Ativar microfone"
+                aria-label="Ativar microfone"
+              >
                 <Mic size={16} />
               </button>
-              <button className="text-gray-400 hover:text-white">
+              <button className="text-gray-400 hover:text-white"
+                title="Enviar mensagem"
+                aria-label="Enviar mensagem"
+              >
                 <Send size={16} />
               </button>
             </div>
@@ -1202,7 +1317,7 @@ export default EcommerceDashboard;`;
   // Renderizar indicador de demonstração
   const renderDemoIndicator = () => {
     if (!demoMode) return null;
-    
+
     return (
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 px-4 rounded-lg shadow-lg z-50 flex items-center">
         <Zap size={18} className="mr-2" />
@@ -1215,14 +1330,17 @@ export default EcommerceDashboard;`;
   return (
     <div className="bg-gray-950 text-gray-200 min-h-screen flex overflow-hidden">
       {renderSidebar()}
-      
+
       <div className="flex-1 flex flex-col transition-all duration-300 w-full">
-        <div className="fixed top-0 left-0 w-full z-20 bg-opacity-50 bg-black h-full" 
-             onClick={() => setMenuVisible(false)}
-             style={{display: menuVisible ? 'block' : 'none'}} 
+        <div className="fixed top-0 left-0 w-full z-20 bg-opacity-50 bg-black h-full"
+          onClick={() => setMenuVisible(false)}
+          style={{ display: menuVisible ? 'block' : 'none' }}
+          role="button"
+          aria-label="Fechar menu lateral"
+          title="Fechar menu lateral"
         />
         {renderHeader()}
-        
+
         <main className="flex-1 overflow-y-auto">
           {activeView === 'dashboard' && renderDashboard()}
           {activeView === 'create' && renderCreate()}
@@ -1239,7 +1357,7 @@ export default EcommerceDashboard;`;
           )}
         </main>
       </div>
-      
+
       {renderChat()}
       {renderDemoIndicator()}
     </div>

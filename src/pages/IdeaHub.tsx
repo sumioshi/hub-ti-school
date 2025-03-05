@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Code, Eye, GitBranch, Sparkles, Layers, Search, Settings,
@@ -8,6 +8,11 @@ import {
   PanelRight, X, Grid, List, Maximize2,
   HelpCircle, Check, Users, ArrowLeft
 } from 'lucide-react';
+import { AIModelSelector } from '../components/AIModelSelector';
+import { AIErrorNotification } from '../components/AIErrorNotification';
+import { APIKeyManager } from '../components/APIKeyManager';
+import { getAvailableModels } from '../lib/services/aiService';
+import { AIModelConfig } from '../lib/types/ai';
 
 // Definir interface para o tipo de projeto
 interface Project {
@@ -35,6 +40,15 @@ export function IdeaHub() {
   const [demoStep, setDemoStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState('gpt4');
   const [showChat, setShowChat] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [showAPIKeyManager, setShowAPIKeyManager] = useState(false);
+  const [availableAIModels, setAvailableAIModels] = useState<AIModelConfig[]>([]);
+
+  // Carregar modelos de IA disponíveis
+  useEffect(() => {
+    const allModels = getAvailableModels();
+    setAvailableAIModels(allModels);
+  }, []);
 
   // Fixar botões sem texto discernível
   useEffect(() => {
@@ -72,8 +86,8 @@ export function IdeaHub() {
     { date: 'Dia 7', sales: 1300, orders: 45 }
   ];
 
-  // Dados simulados
-  const projects = [
+  // Dados simulados - Use useMemo para evitar recriação em cada renderização
+  const projects = useMemo(() => [
     {
       id: 1,
       name: "E-commerce Dashboard",
@@ -129,22 +143,15 @@ export function IdeaHub() {
       preview: "/api/placeholder/800/600",
       status: "in_progress"
     }
-  ];
+  ], []);
 
-  const categories = [
+  const categories = useMemo(() => [
     { id: 'all', name: 'Todos Projetos', count: 12 },
     { id: 'recent', name: 'Recentes', count: 4 },
     { id: 'starred', name: 'Favoritos', count: 5 },
     { id: 'shared', name: 'Compartilhados', count: 3 },
     { id: 'templates', name: 'Templates', count: 8 }
-  ];
-
-  const aiModels = [
-    { id: 'gpt4', name: 'GPT-4 Turbo', provider: 'OpenAI', color: 'from-green-500 to-emerald-600' },
-    { id: 'claude', name: 'Claude 3 Opus', provider: 'Anthropic', color: 'from-purple-500 to-violet-600' },
-    { id: 'codellama', name: 'Code Llama', provider: 'Meta', color: 'from-blue-500 to-cyan-600' },
-    { id: 'starcoder', name: 'StarCoder 2', provider: 'Hugging Face', color: 'from-amber-500 to-red-600' }
-  ];
+  ], []);
 
   const sampleCode = `// React component generated from your description
 import React, { useState, useEffect } from 'react';
@@ -594,6 +601,13 @@ export default EcommerceDashboard;`;
       )}
 
       <div className="ml-auto flex items-center">
+        <div className="mr-4">
+          <AIModelSelector 
+            selectedModel={selectedModel} 
+            onSelectModel={(modelId) => setSelectedModel(modelId)} 
+            onConfigureAPIKeys={() => setShowAPIKeyManager(true)}
+          />
+        </div>
         <button
           onClick={() => setDemoMode(true)}
           className="text-sm text-blue-500 hover:text-blue-400 mr-4"
@@ -880,27 +894,39 @@ export default EcommerceDashboard;`;
           <div>
             <label className="text-white font-medium block mb-2">Modelo de IA</label>
             <div className="space-y-2">
-              {aiModels.map(model => (
-                <div key={model.id} className="flex items-center p-2 rounded-lg hover:bg-gray-700 cursor-pointer">
-                  <input
-                    type="radio"
-                    id={model.id}
-                    name="aiModel"
-                    checked={selectedModel === model.id}
-                    onChange={() => setSelectedModel(model.id)}
-                    className="mr-3 accent-blue-500"
-                  />
-                  <div className="flex items-center flex-1">
-                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-r ${model.color} flex items-center justify-center`}>
-                      <Sparkles size={14} className="text-white" />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor={model.id} className="text-white text-sm font-medium cursor-pointer">{model.name}</label>
-                      <p className="text-gray-400 text-xs">{model.provider}</p>
+              {availableAIModels.length === 0 ? (
+                <div className="text-center p-4 bg-gray-700/50 rounded-lg">
+                  <p className="text-gray-400 mb-2">Nenhum modelo de IA disponível</p>
+                  <button 
+                    onClick={() => setShowAPIKeyManager(true)}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                  >
+                    Configurar Chaves de API
+                  </button>
+                </div>
+              ) : (
+                availableAIModels.map(model => (
+                  <div key={model.id} className="flex items-center p-2 rounded-lg hover:bg-gray-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      id={model.id}
+                      name="aiModel"
+                      checked={selectedModel === model.id}
+                      onChange={() => setSelectedModel(model.id)}
+                      className="mr-3 accent-blue-500"
+                    />
+                    <div className="flex items-center flex-1">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-r ${model.color} flex items-center justify-center`}>
+                        <Sparkles size={14} className="text-white" />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor={model.id} className="text-white text-sm font-medium cursor-pointer">{model.name}</label>
+                        <p className="text-gray-400 text-xs">{model.provider}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -1360,6 +1386,34 @@ export default EcommerceDashboard;`;
 
       {renderChat()}
       {renderDemoIndicator()}
+      {aiError && (
+        <AIErrorNotification 
+          message={aiError} 
+          onDismiss={() => setAiError(null)} 
+        />
+      )}
+      
+      {/* Modal de Configuração de Chaves de API */}
+      {showAPIKeyManager && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+              <h2 className="text-xl font-medium text-white">Configurações de API</h2>
+              <button
+                onClick={() => setShowAPIKeyManager(false)}
+                className="text-gray-400 hover:text-white"
+                title="Fechar"
+                aria-label="Fechar"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6">
+              <APIKeyManager />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,84 @@
+/* Estilos para o seletor de modelo de IA */
+.model-indicator,
+.model-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+}
+
+/* Cores para cada modelo */
+.model-indicator.gpt4,
+.model-dot.gpt4 {
+  background: linear-gradient(to right, #22c55e, #059669);
+}
+
+.model-indicator.claude,
+.model-dot.claude {
+  background: linear-gradient(to right, #a855f7, #7c3aed);
+}
+
+.model-indicator.grok,
+.model-dot.grok {
+  background: linear-gradient(to right, #ef4444, #f97316);
+}
+
+.model-indicator.openrouter,
+.model-dot.openrouter {
+  background: linear-gradient(to right, #3b82f6, #06b6d4);
+}
+
+.model-indicator.local,
+.model-dot.local {
+  background: linear-gradient(to right, #f59e0b, #eab308);
+}
+
+.model-indicator.default,
+.model-dot.default {
+  background-color: #888;
+}
+
+/* Estilos para as opções do dropdown */
+.model-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: #d1d5db;
+}
+
+.model-option:hover,
+.model-option:focus {
+  background-color: #374151;
+  outline: none;
+}
+
+.model-option.selected {
+  background-color: #374151;
+  color: white;
+}
+
+.api-config-option {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: #60a5fa;
+  border-top: 1px solid #4b5563;
+}
+
+.api-config-option:hover,
+.api-config-option:focus {
+  background-color: #374151;
+  outline: none;
+}
+
+.model-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+} 
